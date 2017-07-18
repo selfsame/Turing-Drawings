@@ -12,10 +12,7 @@ const NUMSYMBOLS = 3
 const FRAMES = 30
 var frame = 0
 
-var encoder = new GIFEncoder();
-encoder.setRepeat(0); //0  -> loop forever
-encoder.setDelay(50); //go to next frame every n milliseconds
-encoder.start();
+var encoder = null
 
 
 /*****************************************************************************
@@ -667,6 +664,12 @@ Called after page load to initialize needed resources
 */
 function init()
 {
+		frame = 0
+		encoder = new GIFEncoder();
+		encoder.setRepeat(0); //0  -> loop forever
+		encoder.setDelay(50); //go to next frame every n milliseconds
+		encoder.start();
+
     // Get a reference to the canvas
     canvas = new Canvas(256, 256)
 
@@ -824,9 +827,14 @@ function updateRender()
 
     	encoder.finish();
   		var binary_gif = encoder.stream().getData()
-  		fs.writeFile("out.gif", binary_gif, "binary")
+  		console.log(binary_gif.length)
+  		if (binary_gif.length < 90000){
+  			console.log("not enough entropy...") 
+  			init()
+  		} else {
+  			fs.writeFile("out.gif", binary_gif, "binary")
+  		}
     }
-
 }
 
 
